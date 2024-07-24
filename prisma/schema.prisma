@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id     String   @id @default(uuid())
+  name   String
+  Ticket Ticket[]
+}
+
+model Ticket {
+  id            String       @id @default(uuid())
+  title         String
+  description   String
+  created_at    DateTime     @default(now())
+  updated_at    DateTime?
+  ticket_status TicketStatus
+  user_id       String
+  support_id    String?
+  category      Category     @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  chats         Chat[]
+
+  @@map("tickets")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Chat {
+  id          String   @id @default(uuid())
+  created_at  DateTime @default(now())
+  author_id   String // user or support can create a Chat
+  description String
+
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
+  ticketId String
+}
