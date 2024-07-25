@@ -26,4 +26,27 @@ export class PrismaTicketsRepository implements TicketsRepository {
   async findAllBySupportId (id: string): Promise<Ticket[] | null> {
     return await prisma.ticket.findMany({ where: { support_id: id } })
   }
+
+  async findAll (page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize // Calculate the number of records to skip
+    return await prisma.ticket.findMany({
+      skip,
+      take: pageSize,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        created_at: true,
+        updated_at: true,
+        ticket_status: true,
+        user_id: true,
+        support_id: true,
+        category: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+  }
 }
