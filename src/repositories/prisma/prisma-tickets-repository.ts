@@ -29,7 +29,7 @@ export class PrismaTicketsRepository implements TicketsRepository {
 
   async findAll (page: number, pageSize: number) {
     const skip = (page - 1) * pageSize // Calculate the number of records to skip
-    return await prisma.ticket.findMany({
+    const data = await prisma.ticket.findMany({
       skip,
       take: pageSize,
       select: {
@@ -48,5 +48,7 @@ export class PrismaTicketsRepository implements TicketsRepository {
         }
       }
     })
+    console.log(data)
+    return data
   }
 }

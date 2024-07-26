@@ -2,16 +2,23 @@ import fastify from 'fastify'
 import { env } from './env'
 import { ZodError } from 'zod'
 import { routes } from './http/routes'
-import fastifyJwt from '@fastify/jwt'
+import auth from './http/middlewares/verify-jwt'
 
 export const app = fastify()
 
-app.register(fastifyJwt, {
-  secret: env.JWT_SECRET,
-
+void app.register(auth, {
+  secret: env.JWT_SECRET
 })
 
-app.register(routes)
+app.decorate('authenticate', async (request: any, reply: any) => {
+  try {
+    await request.jwtVerify()
+  } catch (err) {
+    reply.send(err)
+  }
+})
+
+void app.register(routes)
 
 app.setErrorHandler((err, req, res) => {
   if (env.NODE_ENV !== 'prod') console.error(err)

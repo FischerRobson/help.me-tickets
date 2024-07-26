@@ -35,7 +35,7 @@ export class TicketsService {
 
   async findAll (page = 1, pageSize = 10) {
     const tickets = await this.ticketsRepository.findAll(page, pageSize)
-
+    console.log(tickets)
     return { tickets }
   }
 }
