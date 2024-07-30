@@ -16,4 +16,14 @@ export default fp(async (server: FastifyInstance, options: { secret: string }) =
       }
     })
   }
+
+  server.decorateRequest('getUserSub', function (this: any) {
+    try {
+      const decodedToken = this.jwtVerify()
+      return decodedToken.sub
+    } catch (err) {
+      // Handle error (e.g., token invalid or expired)
+      return null
+    }
+  })
 })

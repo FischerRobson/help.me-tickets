@@ -1,5 +1,5 @@
-import { type Ticket } from '@prisma/client'
-import { type CreateTicketParams, type TicketsRepository } from '../tickets-repository'
+import { TicketStatus, type Ticket } from '@prisma/client'
+import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository } from '../tickets-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaTicketsRepository implements TicketsRepository {
@@ -48,7 +48,51 @@ export class PrismaTicketsRepository implements TicketsRepository {
         }
       }
     })
-    console.log(data)
     return data
+  }
+
+  async findAllNotFinished (page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize // Calculate the number of records to skip
+    const data = await prisma.ticket.findMany({
+      skip,
+      take: pageSize,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        created_at: true,
+        updated_at: true,
+        ticket_status: true,
+        user_id: true,
+        support_id: true,
+        category: {
+          select: {
+            name: true
+          }
+        }
+      },
+      where: {
+        NOT: {
+          ticket_status: TicketStatus.CLOSED
+        }
+      }
+    })
+    return data
+  }
+
+  async update (data: UpdateTicketParams, id: string) {
+    await prisma.ticket.update({
+      data: {
+        ticket_status: data.ticketStatus,
+        categoryId: data.categoryId,
+        support_id: data.supportId,
+        updated_at: new Date()
+      },
+      where: { id }
+    })
+  }
+
+  async count () {
+    return await prisma.ticket.count()
   }
 }

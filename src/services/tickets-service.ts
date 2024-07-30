@@ -1,5 +1,6 @@
-import { type TicketsRepository } from '../repositories/tickets-repository'
-import { type Ticket, TicketStatus } from '@prisma/client'
+import { type UpdateTicketParams, type TicketsRepository } from '../repositories/tickets-repository'
+import { Prisma, type Ticket, TicketStatus } from '@prisma/client'
+import { TicketNotFound } from './errors/ticket-not-found'
 
 interface CreateTicketParams {
   title: string
@@ -35,7 +36,17 @@ export class TicketsService {
 
   async findAll (page = 1, pageSize = 10) {
     const tickets = await this.ticketsRepository.findAll(page, pageSize)
-    console.log(tickets)
-    return { tickets }
+    const totalTickets = await this.ticketsRepository.count()
+    return { tickets, totalTickets }
+  }
+
+  async update (data: UpdateTicketParams, id: string) {
+    const ticket = await this.ticketsRepository.findOneById(id)
+
+    if (!ticket) {
+      throw new TicketNotFound()
+    }
+
+    await this.ticketsRepository.update(data, id)
   }
 }
