@@ -3,13 +3,13 @@ import { z } from 'zod'
 import { makeTicketsService } from '@/services/factories/make-tickets-service'
 import { HttpStatusCode } from '@/constants/HttpStatusCode'
 import { TicketNotFound } from '@/services/errors/ticket-not-found'
+import { makeChatsService } from '@/services/factories/make-chats-service'
 
 class TicketsController {
   async create (req: FastifyRequest, res: FastifyReply): Promise<never> {
     const bodySchema = z.object({
       title: z.string(),
       description: z.string(),
-      // userId: z.string(),
       categoryId: z.string()
     })
 
@@ -36,9 +36,12 @@ class TicketsController {
 
     const { page, pageSize } = querySchema.parse(req.query)
 
+    const userId = req.user.sub
+    const userRole = req.user.role
+
     try {
       const service = makeTicketsService()
-      const { tickets, totalTickets } = await service.findAll(page, pageSize)
+      const { tickets, totalTickets } = await service.findAll({ userId, userRole, page, pageSize })
 
       return await res.status(HttpStatusCode.OK).send({ tickets, totalTickets })
     } catch (err) {
@@ -70,6 +73,47 @@ class TicketsController {
         return await res.status(HttpStatusCode.NotFound).send(err.message)
       }
       throw err
+    }
+  }
+
+  async findOneById (req: FastifyRequest, res: FastifyReply) {
+    const paramsSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const { id } = paramsSchema.parse(req.params)
+
+    try {
+      const service = makeTicketsService()
+      const { ticket } = await service.findOneById(id)
+      return await res.status(HttpStatusCode.OK).send({ ticket })
+    } catch (err) {
+      return await res.status(HttpStatusCode.NotFound).send(err)
+    }
+  }
+
+  // CHATS MANAGEMENT
+
+  async createChat (req: FastifyRequest, res: FastifyReply) {
+    const paramsSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const bodySchema = z.object({
+      description: z.string()
+    })
+
+    const userId = req.user.sub
+
+    const { description } = bodySchema.parse(req.body)
+    const { id } = paramsSchema.parse(req.params)
+
+    try {
+      const service = makeChatsService()
+      const { chat } = await service.create({ authorId: userId, description, ticketId: id })
+      return await res.status(HttpStatusCode.Created).send(chat)
+    } catch (err) {
+      await res.status(HttpStatusCode.Conflict).send(err)
     }
   }
 }

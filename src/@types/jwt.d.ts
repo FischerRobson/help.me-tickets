@@ -4,6 +4,7 @@ declare module 'fastify' {
   interface FastifyRequest {
     user: {
       sub: string
+      role: 'USER' | 'ADMIN' | 'SUPPORT'
     }
   }
 }
@@ -15,6 +16,7 @@ declare module '@fastify/jwt' {
     }
     user: {
       sub: string
+      role: 'USER' | 'ADMIN' | 'SUPPORT'
     }
   }
 }

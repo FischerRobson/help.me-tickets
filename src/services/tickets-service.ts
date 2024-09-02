@@ -1,5 +1,5 @@
 import { type UpdateTicketParams, type TicketsRepository } from '../repositories/tickets-repository'
-import { Prisma, type Ticket, TicketStatus } from '@prisma/client'
+import { type Ticket, TicketStatus } from '@prisma/client'
 import { TicketNotFound } from './errors/ticket-not-found'
 
 interface CreateTicketParams {
@@ -11,6 +11,13 @@ interface CreateTicketParams {
 
 interface CreateTicketResponse {
   ticket: Ticket
+}
+
+interface FindAllParams {
+  page?: number
+  pageSize?: number
+  userRole: 'USER' | 'SUPPORT' | 'ADMIN'
+  userId: string
 }
 
 export class TicketsService {
@@ -34,7 +41,11 @@ export class TicketsService {
     return { ticket }
   }
 
-  async findAll (page = 1, pageSize = 10) {
+  async findAll ({ userId, userRole, page = 1, pageSize = 10 }: FindAllParams) {
+    if (userRole === 'USER') {
+      const tickets = await this.ticketsRepository.findAllByUserId(userId, page, pageSize)
+      return { tickets, totalTickets: tickets?.length }
+    }
     const tickets = await this.ticketsRepository.findAll(page, pageSize)
     const totalTickets = await this.ticketsRepository.count()
     return { tickets, totalTickets }
@@ -48,5 +59,10 @@ export class TicketsService {
     }
 
     await this.ticketsRepository.update(data, id)
+  }
+
+  async findOneById (id: string) {
+    const ticket = await this.ticketsRepository.findOneById(id)
+    return { ticket }
   }
 }

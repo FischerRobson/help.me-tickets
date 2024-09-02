@@ -1,4 +1,16 @@
-import { type TicketStatus, type Ticket } from '@prisma/client'
+interface Ticket {
+  id: string
+  title: string
+  description: string
+  created_at: Date
+  updated_at: Date | null
+  ticket_status: TicketStatus
+  user_id: string
+  support_id: string | null
+  categoryId: string
+}
+
+type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
 
 export interface CreateTicketParams {
   title: string
@@ -30,7 +42,7 @@ export interface UpdateTicketParams {
 
 export interface TicketsRepository {
   create: (data: CreateTicketParams) => Promise<Ticket>
-  findAllByUserId: (id: string) => Promise<Ticket[] | null>
+  findAllByUserId: (id: string, page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
   findAllBySupportId: (id: string) => Promise<Ticket[] | null>
   findAll: (page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
   findAllNotFinished: (page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
