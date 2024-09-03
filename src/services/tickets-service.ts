@@ -1,12 +1,14 @@
 import { type UpdateTicketParams, type TicketsRepository } from '../repositories/tickets-repository'
-import { type Ticket, TicketStatus } from '@prisma/client'
-import { TicketNotFound } from './errors/ticket-not-found'
+import { type Ticket } from '@/repositories/tickets-repository'
+import { TicketNotFoundError } from './errors/ticket-not-found-error'
+import { TicketStatus } from '@prisma/client'
 
 interface CreateTicketParams {
   title: string
   description: string
   userId: string
   categoryId: string
+  filesURL?: string[]
 }
 
 interface CreateTicketResponse {
@@ -28,14 +30,15 @@ export class TicketsService {
   }
 
   async create (data: CreateTicketParams): Promise<CreateTicketResponse> {
-    const { title, description, userId, categoryId } = data
+    const { title, description, userId, categoryId, filesURL } = data
 
     const ticket = await this.ticketsRepository.create({
       title,
       description,
       userId,
       ticketStatus: TicketStatus.OPEN,
-      categoryId
+      categoryId,
+      filesURL
     })
 
     return { ticket }
@@ -55,7 +58,7 @@ export class TicketsService {
     const ticket = await this.ticketsRepository.findOneById(id)
 
     if (!ticket) {
-      throw new TicketNotFound()
+      throw new TicketNotFoundError()
     }
 
     await this.ticketsRepository.update(data, id)

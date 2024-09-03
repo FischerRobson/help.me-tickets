@@ -1,4 +1,4 @@
-interface Ticket {
+export interface Ticket {
   id: string
   title: string
   description: string
@@ -8,6 +8,7 @@ interface Ticket {
   user_id: string
   support_id: string | null
   categoryId: string
+  filesURL: string[]
 }
 
 type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
@@ -18,6 +19,7 @@ export interface CreateTicketParams {
   userId: string
   categoryId: string
   ticketStatus: TicketStatus
+  filesURL?: string[]
 }
 
 export type FindAllTicketsResponse = Array<{
@@ -35,9 +37,9 @@ export type FindAllTicketsResponse = Array<{
 }>
 
 export interface UpdateTicketParams {
-  ticketStatus: TicketStatus
-  supportId: string
-  categoryId: string
+  ticketStatus?: TicketStatus
+  supportId?: string
+  categoryId?: string
 }
 
 export interface TicketsRepository {

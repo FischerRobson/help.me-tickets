@@ -10,7 +10,8 @@ export class PrismaTicketsRepository implements TicketsRepository {
         description: dataInput.description,
         categoryId: dataInput.categoryId,
         user_id: dataInput.userId,
-        ticket_status: dataInput.ticketStatus
+        ticket_status: dataInput.ticketStatus,
+        filesURL: dataInput.filesURL
       }
     })
   }

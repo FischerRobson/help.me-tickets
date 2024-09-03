@@ -1,4 +1,4 @@
-export class TicketNotFound extends Error {
+export class TicketNotFoundError extends Error {
   constructor () {
     super('Ticket not found')
   }

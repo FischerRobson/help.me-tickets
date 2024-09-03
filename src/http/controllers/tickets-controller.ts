@@ -2,7 +2,7 @@ import { type FastifyReply, type FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import { makeTicketsService } from '@/services/factories/make-tickets-service'
 import { HttpStatusCode } from '@/constants/HttpStatusCode'
-import { TicketNotFound } from '@/services/errors/ticket-not-found'
+import { TicketNotFoundError } from '@/services/errors/ticket-not-found-error'
 import { makeChatsService } from '@/services/factories/make-chats-service'
 
 class TicketsController {
@@ -10,16 +10,17 @@ class TicketsController {
     const bodySchema = z.object({
       title: z.string(),
       description: z.string(),
-      categoryId: z.string()
+      categoryId: z.string(),
+      filesURL: z.string().array().optional()
     })
 
-    const { title, description, categoryId } = bodySchema.parse(req.body)
+    const { title, description, categoryId, filesURL } = bodySchema.parse(req.body)
 
     const userId = req.user.sub
 
     try {
       const service = makeTicketsService()
-      const { ticket } = await service.create({ title, description, userId, categoryId })
+      const { ticket } = await service.create({ title, description, userId, categoryId, filesURL })
 
       return await res.status(HttpStatusCode.Created).send({ ticket })
     } catch (err) {
@@ -69,7 +70,7 @@ class TicketsController {
       await service.update({ ticketStatus, categoryId, supportId }, id)
       return await res.status(HttpStatusCode.OK).send()
     } catch (err) {
-      if (err instanceof TicketNotFound) {
+      if (err instanceof TicketNotFoundError) {
         return await res.status(HttpStatusCode.NotFound).send(err.message)
       }
       throw err
