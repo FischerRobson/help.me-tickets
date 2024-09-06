@@ -1,5 +1,4 @@
-import { TicketStatus, type Ticket } from '@prisma/client'
-import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository } from '../tickets-repository'
+import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository, type Ticket, TICKET_STATUS } from '../tickets-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaTicketsRepository implements TicketsRepository {
@@ -25,7 +24,8 @@ export class PrismaTicketsRepository implements TicketsRepository {
             description: true,
             id: true,
             created_at: true,
-            author_id: true
+            author_id: true,
+            filesURL: true
           }
         }
       }
@@ -40,7 +40,6 @@ export class PrismaTicketsRepository implements TicketsRepository {
       select: {
         id: true,
         title: true,
-        description: true,
         created_at: true,
         updated_at: true,
         ticket_status: true,
@@ -68,7 +67,6 @@ export class PrismaTicketsRepository implements TicketsRepository {
       select: {
         id: true,
         title: true,
-        description: true,
         created_at: true,
         updated_at: true,
         ticket_status: true,
@@ -92,7 +90,6 @@ export class PrismaTicketsRepository implements TicketsRepository {
       select: {
         id: true,
         title: true,
-        description: true,
         created_at: true,
         updated_at: true,
         ticket_status: true,
@@ -106,7 +103,7 @@ export class PrismaTicketsRepository implements TicketsRepository {
       },
       where: {
         NOT: {
-          ticket_status: TicketStatus.CLOSED
+          ticket_status: TICKET_STATUS.CLOSED
         }
       }
     })

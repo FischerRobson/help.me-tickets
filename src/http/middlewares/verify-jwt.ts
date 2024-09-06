@@ -4,6 +4,8 @@ import fastifyJwt from '@fastify/jwt'
 import { HttpStatusCode } from '@/constants/HttpStatusCode'
 import { env } from '@/env'
 
+const isDevEnv = env.NODE_ENV === 'dev'
+
 export default fp(async (server: FastifyInstance, options: { secret: string }) => {
   void server.register(fastifyJwt, {
     secret: options.secret
@@ -12,7 +14,7 @@ export default fp(async (server: FastifyInstance, options: { secret: string }) =
   if (!server.hasDecorator('authenticate')) {
     server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        if (env.NODE_ENV === 'dev') {
+        if (isDevEnv) {
           await request.jwtVerify({
             ignoreExpiration: true
           })

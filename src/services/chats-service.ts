@@ -8,6 +8,7 @@ interface CreateChatParams {
   authorId: string
   description: string
   ticketId: string
+  filesURL?: string[]
 }
 
 export class ChatsService {

@@ -13,6 +13,13 @@ export interface Ticket {
 
 type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
 
+export const TICKET_STATUS = {
+  OPEN: 'OPEN' as TicketStatus,
+  IN_PROGRESS: 'IN_PROGRESS' as TicketStatus,
+  RESOLVED: 'RESOLVED' as TicketStatus,
+  CLOSED: 'CLOSED' as TicketStatus
+}
+
 export interface CreateTicketParams {
   title: string
   description: string
@@ -25,7 +32,6 @@ export interface CreateTicketParams {
 export type FindAllTicketsResponse = Array<{
   id: string
   title: string
-  description: string
   created_at: Date
   updated_at: Date | null
   ticket_status: TicketStatus

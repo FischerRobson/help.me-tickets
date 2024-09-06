@@ -5,5 +5,8 @@
   - [ X ] preValidation
 - [ ] Improve pagination
 - [ X ] Token Bypass
-- [ ] Create chats validations
+- [ X ] Create chats validations
 - [ ] Handle with files
+  - [ ] - Deletion
+- [ ] Add code coverage
+- [ X ] Fix any prisma dependency in repos

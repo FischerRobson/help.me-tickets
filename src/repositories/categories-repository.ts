@@ -1,7 +1,14 @@
-import { type Category, type Prisma } from '@prisma/client'
+export interface Category {
+  id: string
+  name: string
+}
+
+export interface CreateCategoryParams {
+  name: string
+}
 
 export interface CategoriesRepository {
-  create: (data: Prisma.CategoryCreateInput) => Promise<Category>
+  create: (data: CreateCategoryParams) => Promise<Category>
   findAll: () => Promise<Category[] | null>
   findOneByName: (name: string) => Promise<Category | null>
 }

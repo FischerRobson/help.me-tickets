@@ -7,7 +7,8 @@ export class PrismaChatsRepository implements ChatsRepository {
       data: {
         author_id: data.authorId,
         description: data.description,
-        ticketId: data.ticketId
+        ticketId: data.ticketId,
+        filesURL: data.filesURL
       }
     })
     return chat

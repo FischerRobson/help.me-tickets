@@ -101,17 +101,18 @@ class TicketsController {
     })
 
     const bodySchema = z.object({
-      description: z.string()
+      description: z.string(),
+      filesURL: z.string().array().optional()
     })
 
     const userId = req.user.sub
 
-    const { description } = bodySchema.parse(req.body)
+    const { description, filesURL } = bodySchema.parse(req.body)
     const { id } = paramsSchema.parse(req.params)
 
     try {
       const service = makeChatsService()
-      const { chat } = await service.create({ authorId: userId, description, ticketId: id })
+      const { chat } = await service.create({ authorId: userId, description, ticketId: id, filesURL })
       return await res.status(HttpStatusCode.Created).send(chat)
     } catch (err) {
       await res.status(HttpStatusCode.Conflict).send(err)
