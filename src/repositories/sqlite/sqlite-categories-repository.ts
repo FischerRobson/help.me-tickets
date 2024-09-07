@@ -9,13 +9,14 @@ export class SQLiteCategoriesRepository implements CategoriesRepository {
     this.db = db
   }
 
-  static async createInstance (): Promise<SQLiteCategoriesRepository> {
-    const db = await open({
-      filename: ':memory:', // In-memory SQLite database for testing
-      driver: sqlite3.Database
-    })
+  static async createInstance (db?: Database<sqlite3.Database, sqlite3.Statement>): Promise<SQLiteCategoriesRepository> {
+    if (!db) {
+      db = await open({
+        filename: ':memory:', // In-memory SQLite database for testing
+        driver: sqlite3.Database
+      })
+    }
 
-    // Create a table if it doesn't exist yet
     await db.exec(`
       CREATE TABLE IF NOT EXISTS Category (
         id TEXT PRIMARY KEY,
@@ -52,7 +53,13 @@ export class SQLiteCategoriesRepository implements CategoriesRepository {
     return row as Category
   }
 
-  // Add a method to clear the Category table for testing purposes
+  async findById (id: string): Promise<Category | null> {
+    const row = await this.db.get('SELECT * FROM Category WHERE id = ?', [id])
+
+    if (!row) return null
+    return row as Category
+  }
+
   async clearTable (): Promise<void> {
     await this.db.exec('DELETE FROM Category')
   }

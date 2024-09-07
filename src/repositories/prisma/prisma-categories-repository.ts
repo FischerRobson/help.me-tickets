@@ -13,4 +13,8 @@ export class PrismaCategoryRepository implements CategoriesRepository {
   async findOneByName (name: string) {
     return await prisma.category.findFirst({ where: { name } })
   }
+
+  async findById (id: string) {
+    return await prisma.category.findFirst({ where: { id } })
+  }
 }

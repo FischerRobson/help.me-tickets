@@ -2,6 +2,8 @@ import { type UpdateTicketParams, type TicketsRepository } from '../repositories
 import { type Ticket } from '@/repositories/tickets-repository'
 import { TicketNotFoundError } from './errors/ticket-not-found-error'
 import { TicketStatus } from '@prisma/client'
+import { type CategoriesRepository } from '@/repositories/categories-repository'
+import { CategoryNotFoundError } from './errors/category-not-found-error'
 
 interface CreateTicketParams {
   title: string
@@ -24,13 +26,21 @@ interface FindAllParams {
 
 export class TicketsService {
   private readonly ticketsRepository: TicketsRepository
+  private readonly categoriesRepository: CategoriesRepository
 
-  constructor (ticketsRepository: TicketsRepository) {
+  constructor (ticketsRepository: TicketsRepository, categoriesRepository: CategoriesRepository) {
     this.ticketsRepository = ticketsRepository
+    this.categoriesRepository = categoriesRepository
   }
 
   async create (data: CreateTicketParams): Promise<CreateTicketResponse> {
     const { title, description, userId, categoryId, filesURL } = data
+
+    const category = await this.categoriesRepository.findById(categoryId)
+
+    if (!category) {
+      throw new CategoryNotFoundError()
+    }
 
     const ticket = await this.ticketsRepository.create({
       title,
@@ -47,10 +57,12 @@ export class TicketsService {
   async findAll ({ userId, userRole, page = 1, pageSize = 10 }: FindAllParams) {
     if (userRole === 'USER') {
       const tickets = await this.ticketsRepository.findAllByUserId(userId, page, pageSize)
+      console.log('tickets', tickets)
       return { tickets, totalTickets: tickets?.length }
     }
     const tickets = await this.ticketsRepository.findAll(page, pageSize)
     const totalTickets = await this.ticketsRepository.count()
+    console.log('tickets', tickets)
     return { tickets, totalTickets }
   }
 

@@ -11,7 +11,7 @@ export interface Ticket {
   filesURL: string[]
 }
 
-type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
+export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
 
 export const TICKET_STATUS = {
   OPEN: 'OPEN' as TicketStatus,

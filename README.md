@@ -9,4 +9,5 @@
 - [ ] Handle with files
   - [ ] - Deletion
 - [ ] Add code coverage
+  - [ ] Need to fix bug with categories name on tickets test
 - [ X ] Fix any prisma dependency in repos
