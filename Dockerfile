@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 
 # Copy the built code from the build stage
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/build ./build
 
 # Copy Prisma schema and client generation
 COPY --from=build /app/prisma ./prisma
@@ -35,4 +35,4 @@ COPY --from=build /app/prisma ./prisma
 EXPOSE 3333
 
 # Define the command to start the application
-CMD ["node", "dist/app.js"]
+CMD ["node", "build/server.js"]
