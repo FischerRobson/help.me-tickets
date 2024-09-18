@@ -35,11 +35,11 @@ jobs:
       # Step 5: Build the Docker image with versioned tag
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/tickets-ms:${{ env.VERSION }} .
-          docker tag ${{ secrets.DOCKER_USERNAME }}/tickets-ms:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/tickets-ms:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/helpme-tickets-ms:${{ env.VERSION }} .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/helpme-tickets-ms:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/helpme-tickets-ms:latest
 
       # Step 6: Push the Docker image with version and latest tags
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/tickets-ms:${{ env.VERSION }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/tickets-ms:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/helpme-tickets-ms:${{ env.VERSION }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/helpme-tickets-ms:latest
