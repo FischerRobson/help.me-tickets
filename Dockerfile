@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Run Prisma generate to create the Prisma client
+RUN npx prisma generate
+
 # Build the TypeScript code
 RUN npm run build
 
@@ -28,7 +31,7 @@ COPY --from=build /app/node_modules ./node_modules
 # Copy the built code from the build stage
 COPY --from=build /app/build ./build
 
-# Copy Prisma schema and client generation
+# Copy Prisma schema and generated client from the build stage
 COPY --from=build /app/prisma ./prisma
 
 # Expose the application port (adjust if necessary)
