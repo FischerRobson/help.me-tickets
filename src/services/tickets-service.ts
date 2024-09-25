@@ -4,6 +4,10 @@ import { TicketNotFoundError } from './errors/ticket-not-found-error'
 import { TicketStatus } from '@prisma/client'
 import { type CategoriesRepository } from '@/repositories/categories-repository'
 import { CategoryNotFoundError } from './errors/category-not-found-error'
+import { type RabbitMQService } from './rabbitmq-service'
+import { type MessageProducer } from './interfaces/message-producer'
+import { env } from '@/env'
+import { type Notifier } from '@/events/interfaces/notifier'
 
 interface CreateTicketParams {
   title: string
@@ -27,10 +31,16 @@ interface FindAllParams {
 export class TicketsService {
   private readonly ticketsRepository: TicketsRepository
   private readonly categoriesRepository: CategoriesRepository
+  private readonly notifier: Notifier
 
-  constructor (ticketsRepository: TicketsRepository, categoriesRepository: CategoriesRepository) {
+  constructor (
+    ticketsRepository: TicketsRepository,
+    categoriesRepository: CategoriesRepository,
+    notifier: Notifier
+  ) {
     this.ticketsRepository = ticketsRepository
     this.categoriesRepository = categoriesRepository
+    this.notifier = notifier
   }
 
   async create (data: CreateTicketParams): Promise<CreateTicketResponse> {
@@ -74,6 +84,8 @@ export class TicketsService {
     }
 
     await this.ticketsRepository.update(data, id)
+
+    void this.notifier.setReceiver('fischerrobson@gmail.com').handleTicketUpdated().notify()
   }
 
   async findOneById (id: string) {
