@@ -8,6 +8,7 @@ import { type RabbitMQService } from './rabbitmq-service'
 import { type MessageProducer } from './interfaces/message-producer'
 import { env } from '@/env'
 import { type Notifier } from '@/events/interfaces/notifier'
+import { type MessageConsumer } from './interfaces/message-consumer'
 
 interface CreateTicketParams {
   title: string
@@ -31,16 +32,19 @@ interface FindAllParams {
 export class TicketsService {
   private readonly ticketsRepository: TicketsRepository
   private readonly categoriesRepository: CategoriesRepository
-  private readonly notifier: Notifier
+  private readonly producer: MessageProducer
+  private readonly consumer: MessageConsumer
 
   constructor (
     ticketsRepository: TicketsRepository,
     categoriesRepository: CategoriesRepository,
-    notifier: Notifier
+    producer: MessageProducer,
+    consumer: MessageConsumer
   ) {
     this.ticketsRepository = ticketsRepository
     this.categoriesRepository = categoriesRepository
-    this.notifier = notifier
+    this.producer = producer
+    this.consumer = consumer
   }
 
   async create (data: CreateTicketParams): Promise<CreateTicketResponse> {
@@ -85,7 +89,7 @@ export class TicketsService {
 
     await this.ticketsRepository.update(data, id)
 
-    void this.notifier.setReceiver('fischerrobson@gmail.com').handleTicketUpdated().notify()
+    // void this.producer.produce()
   }
 
   async findOneById (id: string) {

@@ -1,3 +1,3 @@
 export interface MessageProducer {
-  sendToQueue: (queueName: string, message: string) => Promise<void>
+  produce: (queueName: string, message: string) => Promise<void>
 }

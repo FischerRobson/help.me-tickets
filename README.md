@@ -11,3 +11,4 @@
 - [ ] Add code coverage
   - [ ] Need to fix bug with categories name on tickets test
 - [ X ] Fix any prisma dependency in repos
+- [] Rollback all email builder -> back to publish direct to rabbitmq queue and let mail ms handle it
