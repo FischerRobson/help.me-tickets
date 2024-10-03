@@ -10,7 +10,8 @@ export class PrismaTicketsRepository implements TicketsRepository {
         categoryId: dataInput.categoryId,
         user_id: dataInput.userId,
         ticket_status: dataInput.ticketStatus,
-        filesURL: dataInput.filesURL
+        filesURL: dataInput.filesURL,
+        uploadId: dataInput.uploadId
       }
     })
   }
@@ -124,5 +125,36 @@ export class PrismaTicketsRepository implements TicketsRepository {
 
   async count () {
     return await prisma.ticket.count()
+  }
+
+  async findOneByUploadId (uploadId: string) {
+    const ticket = await prisma.ticket.findFirst({
+      where: {
+        uploadId
+      }
+    })
+
+    return ticket
+  }
+
+  async updateFiles (filesURL: string[], id: string) {
+    const ticket = await prisma.ticket.findFirst({
+      where: { id },
+      select: { filesURL: true, id: true }
+    })
+
+    // never should be thrown
+    if (!ticket) {
+      throw new Error('Prisma error: ticket not found')
+    }
+
+    const updatedFilesURL = [...ticket.filesURL, ...filesURL]
+
+    await prisma.ticket.update({
+      where: { id },
+      data: {
+        filesURL: updatedFilesURL
+      }
+    })
   }
 }

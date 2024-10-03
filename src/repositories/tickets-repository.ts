@@ -27,6 +27,7 @@ export interface CreateTicketParams {
   categoryId: string
   ticketStatus: TicketStatus
   filesURL?: string[]
+  uploadId?: string
 }
 
 export type FindAllTicketsResponse = Array<{
@@ -56,5 +57,7 @@ export interface TicketsRepository {
   findAllNotFinished: (page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
   findOneById: (id: string) => Promise<Ticket | null>
   update: (data: UpdateTicketParams, id: string) => Promise<void>
+  updateFiles: (filesURL: string[], id: string) => Promise<void>
+  findOneByUploadId: (uploadId: string) => Promise<Ticket | null>
   count: () => Promise<number>
 }

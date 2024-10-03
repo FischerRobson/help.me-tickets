@@ -1,6 +1,6 @@
 import { env } from '@/env'
 import amqp from 'amqplib'
-import { type MessageQueueService } from './interfaces/message-queue-service'
+import { type MessageQueueService } from '@/services/interfaces/message-queue-service'
 
 export class RabbitMQService implements MessageQueueService {
   async produce (queueName: string, message: string) {

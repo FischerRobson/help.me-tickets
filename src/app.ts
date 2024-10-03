@@ -5,6 +5,7 @@ import auth from './http/middlewares/verify-jwt'
 import { errorHandler } from './error-handler'
 import { logger } from './logger'
 import { collectDefaultMetrics, register } from 'prom-client'
+import { onStart } from './on-start'
 
 collectDefaultMetrics()
 
@@ -24,3 +25,5 @@ app.get('/metrics', async (req, res) => {
 })
 
 app.setErrorHandler(errorHandler)
+
+onStart()

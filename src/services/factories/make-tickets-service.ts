@@ -1,13 +1,13 @@
 import { PrismaCategoryRepository } from '@/repositories/prisma/prisma-categories-repository'
 import { PrismaTicketsRepository } from '../../repositories/prisma/prisma-tickets-repository'
 import { TicketsService } from '../tickets-service'
-import { makeEmailEventBuilder } from '@/events/factories/make-email-event-builder'
+import { MessageQueueServiceBuilder } from '../message-queue/message-queue-service-builder'
 
 export function makeTicketsService (): TicketsService {
   const ticketsService = new TicketsService(
     new PrismaTicketsRepository(),
     new PrismaCategoryRepository(),
-    makeEmailEventBuilder()
+    new MessageQueueServiceBuilder().withRabbitMQ().build()
   )
   return ticketsService
 }

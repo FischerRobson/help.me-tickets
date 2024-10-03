@@ -32,6 +32,7 @@ model Ticket {
   categoryId    String
   chats         Chat[]
   filesURL      String[]     @default([])
+  uploadId      String?
 
   @@map("tickets")
 }

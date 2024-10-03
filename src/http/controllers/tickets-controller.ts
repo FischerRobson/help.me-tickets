@@ -11,16 +11,17 @@ class TicketsController {
       title: z.string(),
       description: z.string(),
       categoryId: z.string(),
-      filesURL: z.string().array().optional()
+      filesURL: z.string().array().optional(),
+      uploadId: z.string().uuid().optional()
     })
 
-    const { title, description, categoryId, filesURL } = bodySchema.parse(req.body)
+    const { title, description, categoryId, filesURL, uploadId } = bodySchema.parse(req.body)
 
     const userId = req.user.sub
 
     try {
       const service = makeTicketsService()
-      const { ticket } = await service.create({ title, description, userId, categoryId, filesURL })
+      const { ticket } = await service.create({ title, description, userId, categoryId, filesURL, uploadId })
 
       return await res.status(HttpStatusCode.Created).send({ ticket })
     } catch (err) {

@@ -56,7 +56,7 @@ export class SQLiteTicketsRepository implements TicketsRepository {
 
     await this.db.run(
       `INSERT INTO tickets 
-        (id, title, description, created_at, updated_at, ticket_status, user_id, support_id, categoryId, filesURL) 
+        (id, title, description, created_at, updated_at, ticket_status, user_id, support_id, categoryId, filesURL, upload_id) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
@@ -68,7 +68,8 @@ export class SQLiteTicketsRepository implements TicketsRepository {
         data.userId,
         null,
         data.categoryId,
-        JSON.stringify(data.filesURL ?? [])
+        JSON.stringify(data.filesURL ?? []),
+        data.uploadId
       ]
     )
 
@@ -247,6 +248,27 @@ export class SQLiteTicketsRepository implements TicketsRepository {
   async count (): Promise<number> {
     const result = await this.db.get('SELECT COUNT(*) as count FROM tickets')
     return result ? result.count : 0
+  }
+
+  async updateFiles (filesURL: string[], id: string) {
+    // Fetch the existing ticket's filesURL
+    const ticket = await this.db.get<{ filesURL: string }>(
+      'SELECT filesURL FROM tickets WHERE id = ?',
+      [id]
+    )
+
+    if (!ticket) {
+      throw new Error('Ticket not found')
+    }
+
+    const existingFilesURL = JSON.parse(ticket.filesURL || '[]') as string[]
+
+    const updatedFilesURL = [...existingFilesURL, ...filesURL]
+
+    await this.db.run(
+      'UPDATE tickets SET filesURL = ? WHERE id = ?',
+      [JSON.stringify(updatedFilesURL), id]
+    )
   }
 
   async clearTable (): Promise<void> {

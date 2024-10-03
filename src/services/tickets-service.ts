@@ -4,11 +4,7 @@ import { TicketNotFoundError } from './errors/ticket-not-found-error'
 import { TicketStatus } from '@prisma/client'
 import { type CategoriesRepository } from '@/repositories/categories-repository'
 import { CategoryNotFoundError } from './errors/category-not-found-error'
-import { type RabbitMQService } from './rabbitmq-service'
-import { type MessageProducer } from './interfaces/message-producer'
-import { env } from '@/env'
-import { type Notifier } from '@/events/interfaces/notifier'
-import { type MessageConsumer } from './interfaces/message-consumer'
+import { type MessageQueueService } from './interfaces/message-queue-service'
 
 interface CreateTicketParams {
   title: string
@@ -16,6 +12,7 @@ interface CreateTicketParams {
   userId: string
   categoryId: string
   filesURL?: string[]
+  uploadId?: string
 }
 
 interface CreateTicketResponse {
@@ -32,23 +29,20 @@ interface FindAllParams {
 export class TicketsService {
   private readonly ticketsRepository: TicketsRepository
   private readonly categoriesRepository: CategoriesRepository
-  private readonly producer: MessageProducer
-  private readonly consumer: MessageConsumer
+  private readonly messageQueueService: MessageQueueService
 
   constructor (
     ticketsRepository: TicketsRepository,
     categoriesRepository: CategoriesRepository,
-    producer: MessageProducer,
-    consumer: MessageConsumer
+    messageQueueService: MessageQueueService
   ) {
     this.ticketsRepository = ticketsRepository
     this.categoriesRepository = categoriesRepository
-    this.producer = producer
-    this.consumer = consumer
+    this.messageQueueService = messageQueueService
   }
 
   async create (data: CreateTicketParams): Promise<CreateTicketResponse> {
-    const { title, description, userId, categoryId, filesURL } = data
+    const { title, description, userId, categoryId, filesURL, uploadId } = data
 
     const category = await this.categoriesRepository.findById(categoryId)
 
@@ -62,7 +56,8 @@ export class TicketsService {
       userId,
       ticketStatus: TicketStatus.OPEN,
       categoryId,
-      filesURL
+      filesURL,
+      uploadId
     })
 
     return { ticket }
@@ -89,11 +84,21 @@ export class TicketsService {
 
     await this.ticketsRepository.update(data, id)
 
-    // void this.producer.produce()
+    // void this.messageQueueService.produce()
   }
 
   async findOneById (id: string) {
     const ticket = await this.ticketsRepository.findOneById(id)
     return { ticket }
+  }
+
+  async addFilesUpload (filesURL: string[], uploadId: string) {
+    const ticket = await this.ticketsRepository.findOneByUploadId(uploadId)
+
+    if (!ticket) {
+      throw new TicketNotFoundError()
+    }
+
+    await this.ticketsRepository.updateFiles(filesURL, ticket.id)
   }
 }
