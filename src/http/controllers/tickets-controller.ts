@@ -4,6 +4,7 @@ import { makeTicketsService } from '@/services/factories/make-tickets-service'
 import { HttpStatusCode } from '@/constants/HttpStatusCode'
 import { TicketNotFoundError } from '@/services/errors/ticket-not-found-error'
 import { makeChatsService } from '@/services/factories/make-chats-service'
+import { TICKET_STATUS } from '@/repositories/tickets-repository'
 
 class TicketsController {
   async create (req: FastifyRequest, res: FastifyReply): Promise<never> {
@@ -31,19 +32,35 @@ class TicketsController {
   }
 
   async findAll (req: FastifyRequest, res: FastifyReply) {
+    const possibleStatus = z.enum([TICKET_STATUS.CLOSED, TICKET_STATUS.IN_PROGRESS, TICKET_STATUS.OPEN, TICKET_STATUS.RESOLVED])
+
     const querySchema = z.object({
       page: z.coerce.number().optional(),
-      pageSize: z.coerce.number().optional()
+      pageSize: z.coerce.number().optional(),
+      status: z
+        .union([possibleStatus, z.array(possibleStatus)])
+        .optional()
     })
 
-    const { page, pageSize } = querySchema.parse(req.query)
+    const normalizeToArray = <T>(value?: T | T[]): T[] | undefined => {
+      if (!value) return undefined
+      return Array.isArray(value) ? value : [value]
+    }
+
+    // Normalize the query parameters
+    const normalizedQuery = {
+      ...req.query,
+      status: normalizeToArray(req.query.status)
+    }
+
+    const { page, pageSize, status } = querySchema.parse(normalizedQuery)
 
     const userId = req.user.sub
     const userRole = req.user.role
 
     try {
       const service = makeTicketsService()
-      const { tickets, totalTickets } = await service.findAll({ userId, userRole, page, pageSize })
+      const { tickets, totalTickets } = await service.findAll({ userId, userRole, page, pageSize, status })
 
       return await res.status(HttpStatusCode.OK).send({ tickets, totalTickets })
     } catch (err) {

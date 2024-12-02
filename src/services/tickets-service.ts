@@ -24,7 +24,10 @@ interface FindAllParams {
   pageSize?: number
   userRole: 'USER' | 'SUPPORT' | 'ADMIN'
   userId: string
+  status?: TicketStatus[]
 }
+
+const allPossibleStates: TicketStatus[] = [TicketStatus.CLOSED, TicketStatus.IN_PROGRESS, TicketStatus.OPEN, TicketStatus.RESOLVED]
 
 export class TicketsService {
   private readonly ticketsRepository: TicketsRepository
@@ -63,13 +66,14 @@ export class TicketsService {
     return { ticket }
   }
 
-  async findAll ({ userId, userRole, page = 1, pageSize = 10 }: FindAllParams) {
+  async findAll ({ userId, userRole, page = 1, pageSize = 10, status = allPossibleStates }: FindAllParams) {
     if (userRole === 'USER') {
-      const tickets = await this.ticketsRepository.findAllByUserId(userId, page, pageSize)
+      const tickets = await this.ticketsRepository.findAllByUserId(userId, page, pageSize, status)
       console.log('tickets', tickets)
       return { tickets, totalTickets: tickets?.length }
     }
-    const tickets = await this.ticketsRepository.findAll(page, pageSize)
+
+    const tickets = await this.ticketsRepository.findAll(page, pageSize, status)
     const totalTickets = await this.ticketsRepository.count()
     console.log('tickets', tickets)
     return { tickets, totalTickets }

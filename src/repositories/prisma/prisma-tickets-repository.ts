@@ -1,4 +1,4 @@
-import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository, type Ticket, TICKET_STATUS } from '../tickets-repository'
+import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository, type Ticket, TICKET_STATUS, type TicketStatus } from '../tickets-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaTicketsRepository implements TicketsRepository {
@@ -33,7 +33,7 @@ export class PrismaTicketsRepository implements TicketsRepository {
     })
   }
 
-  async findAllByUserId (id: string, page: number, pageSize: number) {
+  async findAllByUserId (id: string, page: number, pageSize: number, status: TicketStatus[]) {
     const skip = (page - 1) * pageSize
     return await prisma.ticket.findMany({
       skip,
@@ -52,7 +52,12 @@ export class PrismaTicketsRepository implements TicketsRepository {
           }
         }
       },
-      where: { user_id: id }
+      where: {
+        user_id: id,
+        ticket_status: {
+          in: status
+        }
+      }
     })
   }
 
@@ -60,7 +65,7 @@ export class PrismaTicketsRepository implements TicketsRepository {
     return await prisma.ticket.findMany({ where: { support_id: id } })
   }
 
-  async findAll (page: number, pageSize: number) {
+  async findAll (page: number, pageSize: number, status: TicketStatus[]) {
     const skip = (page - 1) * pageSize // Calculate the number of records to skip
     const data = await prisma.ticket.findMany({
       skip,
@@ -77,6 +82,11 @@ export class PrismaTicketsRepository implements TicketsRepository {
           select: {
             name: true
           }
+        }
+      },
+      where: {
+        ticket_status: {
+          in: status
         }
       }
     })

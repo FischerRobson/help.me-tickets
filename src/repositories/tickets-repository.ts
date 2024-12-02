@@ -51,9 +51,9 @@ export interface UpdateTicketParams {
 
 export interface TicketsRepository {
   create: (data: CreateTicketParams) => Promise<Ticket>
-  findAllByUserId: (id: string, page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
+  findAllByUserId: (id: string, page: number, pageSize: number, status: TicketStatus[]) => Promise<FindAllTicketsResponse | null>
   findAllBySupportId: (id: string) => Promise<Ticket[] | null>
-  findAll: (page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
+  findAll: (page: number, pageSize: number, status: TicketStatus[]) => Promise<FindAllTicketsResponse | null>
   findAllNotFinished: (page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
   findOneById: (id: string) => Promise<Ticket | null>
   update: (data: UpdateTicketParams, id: string) => Promise<void>
