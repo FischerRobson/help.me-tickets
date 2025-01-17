@@ -10,6 +10,10 @@ interface CreateCategoryResponse {
   category: Category
 }
 
+interface FindAllCategories {
+  categories: Category[] | null
+}
+
 export class CategoriesService {
   private readonly categoriesRepository: CategoriesRepository
 
@@ -28,5 +32,10 @@ export class CategoriesService {
 
     const category = await this.categoriesRepository.create({ name })
     return { category }
+  }
+
+  async findAll (): Promise<FindAllCategories> {
+    const categories = await this.categoriesRepository.findAll()
+    return { categories }
   }
 }

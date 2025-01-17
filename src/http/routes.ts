@@ -11,4 +11,5 @@ export async function routes (app: FastifyInstance) {
   app.get('/tickets/:id', { preValidation: [app.authenticate] }, ticketsController.findOneById)
 
   app.post('/categories', { preValidation: [app.authenticate] }, categoriesController.create)
+  app.get('/categories', { preValidation: [app.authenticate] }, categoriesController.findAll)
 }

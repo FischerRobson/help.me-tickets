@@ -23,6 +23,19 @@ class CategoriesController {
       throw err
     }
   }
+
+  async findAll (req: FastifyRequest, res: FastifyReply) {
+    try {
+      const service = makeCategoriesService()
+      const resp = await service.findAll()
+      return await res.status(HttpStatusCode.OK).send(resp)
+    } catch (err) {
+      if (err instanceof CategoryAlreadyExistsError) {
+        return await res.status(HttpStatusCode.BadRequest).send(err.message)
+      }
+      throw err
+    }
+  }
 }
 
 export const categoriesController = new CategoriesController()
