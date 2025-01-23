@@ -6,6 +6,7 @@ import { errorHandler } from './error-handler'
 import { logger } from './logger'
 import { collectDefaultMetrics, register } from 'prom-client'
 import { onStart } from './on-start'
+import { corsConfig } from './cors'
 
 collectDefaultMetrics()
 
@@ -27,3 +28,11 @@ app.get('/metrics', async (req, res) => {
 app.setErrorHandler(errorHandler)
 
 onStart()
+
+// Register CORS configuration
+corsConfig(app)
+  .then(() => { console.log('CORS configured successfully') })
+  .catch((err) => {
+    console.error('Error configuring CORS:', err)
+    process.exit(1)
+  })
