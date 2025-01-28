@@ -7,7 +7,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   RABBITMQ_HOST: z.string(),
   RABBITMQ_NOTIFICATION_QUEUE: z.string(),
-  CORS_ALLOWED_ORIGINS: z.string().array()
+  CORS_ALLOWED_ORIGINS: z.union([z.string(), z.array(z.string())])
 })
 
 const _env = envSchema.safeParse(process.env)
