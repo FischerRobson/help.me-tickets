@@ -29,7 +29,6 @@ app.setErrorHandler(errorHandler)
 
 onStart()
 
-// Register CORS configuration
 corsConfig(app)
   .then(() => { console.log('CORS configured successfully') })
   .catch((err) => {

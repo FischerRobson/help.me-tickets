@@ -1,10 +1,11 @@
 import { type FastifyInstance } from 'fastify'
 import cors from '@fastify/cors'
+import { env } from './env'
 
 export async function corsConfig (fastify: FastifyInstance) {
   await fastify.register(cors, {
     origin: (origin, callback) => {
-      const allowedOrigins = ['http://localhost:3000']
+      const allowedOrigins = env.CORS_ALLOWED_ORIGINS
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true)
       } else {
