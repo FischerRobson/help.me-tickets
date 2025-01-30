@@ -1,4 +1,4 @@
-import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository, type Ticket, TICKET_STATUS, type TicketStatus } from '../tickets-repository'
+import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository, type Ticket, TICKET_STATUS, type TicketStatus, type FindTicketById } from '../tickets-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaTicketsRepository implements TicketsRepository {
@@ -16,14 +16,28 @@ export class PrismaTicketsRepository implements TicketsRepository {
     })
   }
 
-  async findOneById (id: string): Promise<Ticket | null> {
+  async findOneById (id: string): Promise<FindTicketById | null> {
     return await prisma.ticket.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        created_at: true,
+        updated_at: true,
+        ticket_status: true,
+        user_id: true,
+        support_id: true,
+        filesURL: true,
+        category: {
+          select: {
+            name: true
+          }
+        },
         chats: {
           select: {
-            description: true,
             id: true,
+            description: true,
             created_at: true,
             author_id: true,
             filesURL: true

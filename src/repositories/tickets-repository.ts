@@ -11,6 +11,21 @@ export interface Ticket {
   filesURL: string[]
 }
 
+export interface FindTicketById {
+  id: string
+  title: string
+  description: string
+  created_at: Date
+  updated_at: Date | null
+  ticket_status: TicketStatus
+  user_id: string
+  support_id: string | null
+  category: {
+    name: string
+  }
+  filesURL: string[]
+}
+
 export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
 
 export const TICKET_STATUS = {
@@ -55,7 +70,7 @@ export interface TicketsRepository {
   findAllBySupportId: (id: string) => Promise<Ticket[] | null>
   findAll: (page: number, pageSize: number, status: TicketStatus[]) => Promise<FindAllTicketsResponse | null>
   findAllNotFinished: (page: number, pageSize: number) => Promise<FindAllTicketsResponse | null>
-  findOneById: (id: string) => Promise<Ticket | null>
+  findOneById: (id: string) => Promise<FindTicketById | null>
   update: (data: UpdateTicketParams, id: string) => Promise<void>
   updateFiles: (filesURL: string[], id: string) => Promise<void>
   findOneByUploadId: (uploadId: string) => Promise<Ticket | null>

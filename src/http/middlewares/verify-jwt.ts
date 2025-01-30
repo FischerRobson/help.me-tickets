@@ -5,39 +5,15 @@ import { HttpStatusCode } from '@/constants/HttpStatusCode'
 import { env } from '@/env'
 import fastifyCookie from '@fastify/cookie'
 
-// const isDevEnv = env.NODE_ENV === 'dev'
-
-// export default fp(async (server: FastifyInstance, options: { secret: string }) => {
-//   void server.register(fastifyJwt, {
-//     secret: options.secret
-//   })
-
-//   if (!server.hasDecorator('authenticate')) {
-//     server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
-//       try {
-//         if (isDevEnv) {
-//           await request.jwtVerify({
-//             ignoreExpiration: true
-//           })
-//         } else {
-//           await request.jwtVerify()
-//         }
-//       } catch (err) {
-//         void reply.status(HttpStatusCode.Unauthorized).send(err)
-//       }
-//     })
-//   }
-// })
-
 const isDevEnv = env.NODE_ENV === 'dev'
 
 export default fp(async (server: FastifyInstance, options: { secret: string }) => {
+  void server.register(fastifyCookie) // Register the cookie plugin
+
   void server.register(fastifyJwt, {
     secret: options.secret,
     cookie: { cookieName: 'jwt' } // prevent Authorization to be checked
   })
-
-  void server.register(fastifyCookie) // Register the cookie plugin
 
   if (!server.hasDecorator('authenticate')) {
     server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
