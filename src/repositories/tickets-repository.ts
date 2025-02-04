@@ -45,18 +45,23 @@ export interface CreateTicketParams {
   uploadId?: string
 }
 
-export type FindAllTicketsResponse = Array<{
-  id: string
-  title: string
-  created_at: Date
-  updated_at: Date | null
-  ticket_status: TicketStatus
-  user_id: string
-  support_id: string | null
-  category: {
-    name: string
-  }
-}>
+export interface FindAllTicketsResponse {
+  tickets: Array<{
+    id: string
+    title: string
+    created_at: Date
+    updated_at: Date | null
+    ticket_status: TicketStatus
+    user_id: string
+    support_id: string | null
+    category: {
+      name: string
+    }
+  }>
+  totalItems: number
+  totalPages: number
+  currentPage: number
+}
 
 export interface UpdateTicketParams {
   ticketStatus?: TicketStatus

@@ -60,9 +60,9 @@ class TicketsController {
 
     try {
       const service = makeTicketsService()
-      const { tickets, totalTickets } = await service.findAll({ userId, userRole, page, pageSize, status })
+      const response = await service.findAll({ userId, userRole, page, pageSize, status })
 
-      return await res.status(HttpStatusCode.OK).send({ tickets, totalTickets })
+      return await res.status(HttpStatusCode.OK).send(response)
     } catch (err) {
       console.error(err)
       throw err

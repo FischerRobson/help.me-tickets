@@ -49,7 +49,17 @@ export class PrismaTicketsRepository implements TicketsRepository {
 
   async findAllByUserId (id: string, page: number, pageSize: number, status: TicketStatus[]) {
     const skip = (page - 1) * pageSize
-    return await prisma.ticket.findMany({
+
+    const totalItems = await prisma.ticket.count({
+      where: {
+        user_id: id,
+        ticket_status: { in: status }
+      }
+    })
+
+    const totalPages = Math.ceil(totalItems / pageSize)
+
+    const tickets = await prisma.ticket.findMany({
       skip,
       take: pageSize,
       select: {
@@ -73,6 +83,13 @@ export class PrismaTicketsRepository implements TicketsRepository {
         }
       }
     })
+
+    return {
+      tickets,
+      currentPage: page,
+      totalItems,
+      totalPages
+    }
   }
 
   async findAllBySupportId (id: string): Promise<Ticket[] | null> {
@@ -80,8 +97,17 @@ export class PrismaTicketsRepository implements TicketsRepository {
   }
 
   async findAll (page: number, pageSize: number, status: TicketStatus[]) {
-    const skip = (page - 1) * pageSize // Calculate the number of records to skip
-    const data = await prisma.ticket.findMany({
+    const skip = (page - 1) * pageSize
+
+    const totalItems = await prisma.ticket.count({
+      where: {
+        ticket_status: { in: status }
+      }
+    })
+
+    const totalPages = Math.ceil(totalItems / pageSize)
+
+    const tickets = await prisma.ticket.findMany({
       skip,
       take: pageSize,
       select: {
@@ -104,12 +130,27 @@ export class PrismaTicketsRepository implements TicketsRepository {
         }
       }
     })
-    return data
+
+    return {
+      tickets,
+      currentPage: page,
+      totalItems,
+      totalPages
+    }
   }
 
   async findAllNotFinished (page: number, pageSize: number) {
-    const skip = (page - 1) * pageSize // Calculate the number of records to skip
-    const data = await prisma.ticket.findMany({
+    const skip = (page - 1) * pageSize
+
+    const totalItems = await prisma.ticket.count({
+      where: {
+        ticket_status: { equals: 'CLOSED' }
+      }
+    })
+
+    const totalPages = Math.ceil(totalItems / pageSize)
+
+    const tickets = await prisma.ticket.findMany({
       skip,
       take: pageSize,
       select: {
@@ -132,7 +173,13 @@ export class PrismaTicketsRepository implements TicketsRepository {
         }
       }
     })
-    return data
+
+    return {
+      tickets,
+      currentPage: page,
+      totalItems,
+      totalPages
+    }
   }
 
   async update (data: UpdateTicketParams, id: string) {

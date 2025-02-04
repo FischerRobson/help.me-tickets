@@ -68,15 +68,12 @@ export class TicketsService {
 
   async findAll ({ userId, userRole, page = 1, pageSize = 10, status = allPossibleStates }: FindAllParams) {
     if (userRole === 'USER') {
-      const tickets = await this.ticketsRepository.findAllByUserId(userId, page, pageSize, status)
-      console.log('tickets', tickets)
-      return { tickets, totalTickets: tickets?.length }
+      const response = await this.ticketsRepository.findAllByUserId(userId, page, pageSize, status)
+      return response
     }
 
-    const tickets = await this.ticketsRepository.findAll(page, pageSize, status)
-    const totalTickets = await this.ticketsRepository.count()
-    console.log('tickets', tickets)
-    return { tickets, totalTickets }
+    const response = await this.ticketsRepository.findAll(page, pageSize, status)
+    return response
   }
 
   async update (data: UpdateTicketParams, id: string) {
@@ -87,8 +84,6 @@ export class TicketsService {
     }
 
     await this.ticketsRepository.update(data, id)
-
-    // void this.messageQueueService.produce()
   }
 
   async findOneById (id: string) {
