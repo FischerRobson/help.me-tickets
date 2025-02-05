@@ -1,5 +1,6 @@
 import { type UpdateTicketParams, type CreateTicketParams, type TicketsRepository, type Ticket, TICKET_STATUS, type TicketStatus, type FindTicketById } from '../tickets-repository'
 import { prisma } from '../../lib/prisma'
+import dayjs from 'dayjs'
 
 export class PrismaTicketsRepository implements TicketsRepository {
   async create (dataInput: CreateTicketParams): Promise<Ticket> {
@@ -227,5 +228,61 @@ export class PrismaTicketsRepository implements TicketsRepository {
         filesURL: updatedFilesURL
       }
     })
+  }
+
+  async ticketsOpenedToday () {
+    const today = dayjs()
+
+    const ticketsOpenedToday = await prisma.ticket.count({
+      where: {
+        created_at: {
+          gte: today.startOf('day').toString(),
+          lte: today.endOf('day').toString()
+        }
+      }
+    })
+
+    return ticketsOpenedToday
+  }
+
+  async categorizedTickets () {
+    const ticketsByCategory = await prisma.ticket.groupBy({
+      by: ['categoryId'],
+      _count: { id: true }
+    })
+
+    const categoryNames = await prisma.category.findMany({
+      select: { id: true, name: true }
+    })
+
+    const categorizedTickets = ticketsByCategory.map((group) => ({
+      category: categoryNames.find((c) => c.id === group.categoryId)?.name ?? 'Unknown',
+      count: group._count.id
+    }))
+
+    return categorizedTickets
+  }
+
+  async ticketsPerDayForLast7Days () {
+    const today = dayjs()
+
+    const ticketCounts = await Promise.all(
+      Array.from({ length: 7 }, async (_, i) => {
+        const date = today.subtract(i, 'day')
+
+        const count = await prisma.ticket.count({
+          where: {
+            created_at: {
+              gte: date.startOf('day').toDate(),
+              lte: date.endOf('day').toDate()
+            }
+          }
+        })
+
+        return { date: date.format('YYYY-MM-DD'), count }
+      })
+    )
+
+    return ticketCounts
   }
 }

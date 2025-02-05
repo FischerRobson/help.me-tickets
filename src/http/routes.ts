@@ -2,6 +2,7 @@
 import { type FastifyInstance } from 'fastify'
 import { ticketsController } from './controllers/tickets-controller'
 import { categoriesController } from './controllers/categories-controller'
+import { dashboardController } from './controllers/dashboard-controller'
 
 export async function routes (app: FastifyInstance) {
   app.post('/tickets', { preValidation: [app.authenticate] }, ticketsController.create)
@@ -12,4 +13,6 @@ export async function routes (app: FastifyInstance) {
 
   app.post('/categories', { preValidation: [app.authenticate] }, categoriesController.create)
   app.get('/categories', { preValidation: [app.authenticate] }, categoriesController.findAll)
+
+  app.get('/dashboard', { preValidation: [app.authenticate] }, dashboardController.getDashboardData)
 }

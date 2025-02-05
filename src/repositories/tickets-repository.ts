@@ -69,6 +69,16 @@ export interface UpdateTicketParams {
   categoryId?: string
 }
 
+type TicketsPerCategory = Array<{
+  category: string
+  count: number
+}>
+
+type TicketsPerDayForLast7Days = Array<{
+  date: string
+  count: number
+}>
+
 export interface TicketsRepository {
   create: (data: CreateTicketParams) => Promise<Ticket>
   findAllByUserId: (id: string, page: number, pageSize: number, status: TicketStatus[]) => Promise<FindAllTicketsResponse | null>
@@ -80,4 +90,7 @@ export interface TicketsRepository {
   updateFiles: (filesURL: string[], id: string) => Promise<void>
   findOneByUploadId: (uploadId: string) => Promise<Ticket | null>
   count: () => Promise<number>
+  ticketsOpenedToday: () => Promise<number>
+  categorizedTickets: () => Promise<TicketsPerCategory>
+  ticketsPerDayForLast7Days: () => Promise<TicketsPerDayForLast7Days>
 }
