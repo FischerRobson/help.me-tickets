@@ -236,8 +236,8 @@ export class PrismaTicketsRepository implements TicketsRepository {
     const ticketsOpenedToday = await prisma.ticket.count({
       where: {
         created_at: {
-          gte: today.startOf('day').toString(),
-          lte: today.endOf('day').toString()
+          gte: today.startOf('day').toDate(),
+          lte: today.endOf('day').toDate()
         }
       }
     })
